@@ -1,4 +1,4 @@
-# Download alloy binary --> https://github.com/grafana/alloy/releases/download/v1.4.3/alloy-1.4.3-1.amd64.deb
+// Download alloy binary for debian based linux --> https://github.com/grafana/alloy/releases/download/v1.4.3/alloy-1.4.3-1.amd64.deb
 
         logging {
           level = "debug"
@@ -27,9 +27,9 @@
           targets = array.concat(
             prometheus.exporter.unix.default.targets,
             [{
-              job         = "cloudflare",
+              job         = "server01",
               __address__ = "127.0.0.1:12345",
-                  application = "cloudflare",
+                  application = "nodejs",
               environment = "testing",
             }],
           )
