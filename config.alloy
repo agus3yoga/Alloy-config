@@ -1,0 +1,45 @@
+# Download alloy binary --> https://github.com/grafana/alloy/releases/download/v1.4.3/alloy-1.4.3-1.amd64.deb
+
+        logging {
+          level = "debug"
+        }
+         
+        prometheus.exporter.unix "default" {
+          include_exporter_metrics = false
+          enable_collectors     = ["systemd", "processes"]
+          disable_collectors    = ["mdadm"]
+         
+          filesystem {
+            fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+            mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+            mount_timeout        = "5s"
+          }
+          netclass {
+            ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+          }
+         
+          netdev {
+            device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
+          }
+        }
+         
+        prometheus.scrape "default" {
+          targets = array.concat(
+            prometheus.exporter.unix.default.targets,
+            [{
+              job         = "cloudflare",
+              __address__ = "127.0.0.1:12345",
+                  application = "cloudflare",
+              environment = "testing",
+            }],
+          )
+         
+          forward_to = [prometheus.remote_write.metrics_service.receiver]
+          scrape_interval = "10s"
+        }
+         
+        prometheus.remote_write "metrics_service" {
+            endpoint {
+                url = "http://prometheus:9090/api/v1/write"
+            }
+        }
