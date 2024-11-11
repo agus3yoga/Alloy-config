@@ -1,3 +1,6 @@
+logging {
+  level = "debug"
+}
 prometheus.exporter.windows "default" { }
 
 // Configure a prometheus.scrape component to collect windows metrics.
@@ -8,6 +11,6 @@ prometheus.scrape "default" {
 
 prometheus.remote_write "default" {
   endpoint {
-    url = http://172.16.1.98:9090/api/v1/write
+    url = "http://172.16.1.98:9090/api/v1/write"
   }
 }
